@@ -869,7 +869,7 @@
 						}
 					}
 				};
-//hi
+
 				var fnCountHits = function (row,multiplicator) {
 					switch(multiplicator)
 					{
@@ -1162,6 +1162,7 @@
 			};
 
 			var fnScram = function () {
+				//finish later
 				var fnWinner = function () {
 					if(oScore.round == 1)
 					{
@@ -1199,6 +1200,19 @@
 					else
 					{
 
+					}
+				};
+			};
+
+			var fnCountUp = function (maxScore) {
+				var fnWinner = function () {
+					if(oScore.score[oScore.activePlayer][0]>=maxScore)
+					{
+						var nrWinner = 0;
+						for(var i=0;i<oScore.numberPlayers;i++)
+						{
+							
+						}
 					}
 				};
 			};
