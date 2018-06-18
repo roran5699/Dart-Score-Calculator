@@ -1494,8 +1494,6 @@
 					if($("#gamemode").val()=="cricket")
 					{
 						fnStartCricket();
-						//$("#button2").css("visibility","visible");
-						//$("#button3").css("visibility","visible");
 					}
 					if($("#gamemode").val()=="noSCricket")
 					{
