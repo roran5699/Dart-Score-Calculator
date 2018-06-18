@@ -2,7 +2,7 @@ body {
     background-image: url("../resource/wood-591631_1920.jpg");
     /*background-color: lightskyblue;*/
 }
-select {
+#gamemode {
     top: 120px;
     left:878px;
     position: fixed;
@@ -56,7 +56,7 @@ td {
 }
 .Winner2 {
     /*background-color:silver;*/
-    background: linear-gradient(135deg, #b5b5b5,white,white,#b5b5b5);
+    background: linear-gradient(135deg, #b5b5b5,white,#b5b5b5);
 }
 .Winner3 {
     /*background-color:#cd7f32;*/
@@ -86,7 +86,7 @@ table {
     padding: 7px 10px;
     text-align: center;
     padding-left: 1px;
-      padding-right: 1px;
+    padding-right: 1px;
 }
 #button1 {
     top: 167px;
@@ -109,4 +109,24 @@ table {
     top: 170px;
     left:878px;
     position: fixed;
+}
+
+fieldset {
+    padding:0; 
+    border:0;
+    width:250px;
+}
+#playerRemove {
+    margin-bottom:12px;
+    width:150px;
+}
+#playerNameIn {
+    margin-bottom:12px;
+    width:150px;
+}
+#remove {
+    font-size:10pt;
+}
+#addPlayer {
+    font-size:10pt;
 }

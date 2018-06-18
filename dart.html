@@ -4,6 +4,7 @@
 <head>
 	<link href="css/style.css" rel="stylesheet" type="text/css"/>
 	<title>Dartscheibe</title>
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
  	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -14,7 +15,7 @@
 <body>
 	<div class="settingsContainer">
 		<form>
-			<select oninput="if($(this).val()=='scram'){document.getElementById('playerNr').disabled=true;}else{document.getElementById('playerNr').disabled=false;}" id="gamemode" name="Gamemode">
+			<select id="gamemode" name="Gamemode">
 				<option value="cricket">Cricket</option>
 				<option value="noSCricket">No-Score-Cricket</option>
 				<option value="game301">Game301</option>
@@ -173,6 +174,20 @@
 		</g>
 	</svg>
 	<div id="scoreTable" />
+
+	<div id="playerRegistration" class="ui-widget" title="Team 1">
+		<fieldset>
+			<label for="playerNameIn">Name (3 Letters):</label>
+			<input type="text" id="playerNameIn" list="accounts" minlength="3" maxlength="3">
+			<datalist id="accounts"></datalist>
+			<input type="button" id="addPlayer" value="Add">
+
+			<label for="playerRemove">Remove Player:</label>
+			<select id="playerRemove" name="PlayerRemove">
+			</select>
+			<input type="button" id="remove" value="Remove">
+		</fieldset>
+	</div>
 </body>
 
 </html>

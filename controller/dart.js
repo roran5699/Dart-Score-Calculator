@@ -1,3 +1,64 @@
+            /*var p1 = {
+                name:"P1",
+                hits:[0,0,0,0,0,0,0,0]
+            };
+            var p2 = {
+                name:"P2",
+                throws:[]
+            };
+            var teams = [[p1],[p2]];
+            /*games(teams(players(throws())))*/
+
+            /*var oGame = {
+                md: "cricket",
+                tm: [
+                    {
+                        sc: 0,
+                        pl: undefined,
+                        p: [
+                            {
+                                n: "P1",
+                                t: [
+                                    //
+                                    {
+                                        opened: true,
+                                        closed: false,
+                                        multiplicator: 3,
+                                        field: 20,
+                                        score: 40,
+                                        hit: true
+                                    }, {
+                                        o: false,
+                                        c: false,
+                                        m: 0,
+                                        f: 0,
+                                        s: 0,
+                                        h: false
+                                    }, {
+                                        opened: false,
+                                        closed: false,
+                                        multiplicator: 0,
+                                        field: 0,
+                                        score: 0,
+                                        hit: false
+                                    }
+                                    //
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        score: 0,
+                        placement: undefined,
+                        players: [
+                            {
+                                name: "P2",
+                                throws: [ ]
+                            }
+                        ]
+                    }
+                ]
+            };*/
 
 			var fnStartCricket = function () {
 				
@@ -302,7 +363,8 @@
 						if(oScore.score[oScore.activePlayer][8]>0)
 							fnNextPlayer();
 					}
-					oScore.throwNr=0;
+                    oScore.throwNr=0;
+                    fnBuildTable();
 				};
 
 				fnResetOScore();
@@ -1473,11 +1535,28 @@
 				);
 				fnBuildTable();
 			};
-		// we have jQuery at our disposal
-		
+        // we have jQuery at our disposal
 		$(document).ready(function () {
 			
+            var dialog;
+            dialog = $( "#playerRegistration" ).dialog({
+                autoOpen: false,
+                height: 400,
+                width: 350,
+                modal: true,
+                closeOnEscape: false,
+                buttons: {
+                  Cancel: function() {
+                    dialog.dialog( "close" );
+                  }
+                }
+            ,
+                close: function() {
+                    form[ 0 ].reset();
+                }
+            });
 			/*fnBackup();*/
+            dialog.dialog("open");
 			fnStartCricket();
 
 			$("#dartboard #areas g").children().hover(
@@ -1493,6 +1572,7 @@
 				function () {
 					if($("#gamemode").val()=="cricket")
 					{
+                        dialog.dialog("open");
 						fnStartCricket();
 					}
 					if($("#gamemode").val()=="noSCricket")
