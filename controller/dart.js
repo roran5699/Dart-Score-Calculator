@@ -8,57 +8,59 @@
             };
             var teams = [[p1],[p2]];
             /*games(teams(players(throws())))*/
-
-            /*var oGame = {
+			var oAccounts = [
+			];
+            var oGame = {
                 md: "cricket",
                 tm: [
                     {
                         sc: 0,
-                        pl: undefined,
+                        pl: 0,
                         p: [
                             {
                                 n: "P1",
                                 t: [
-                                    //
                                     {
-                                        opened: true,
-                                        closed: false,
-                                        multiplicator: 3,
-                                        field: 20,
-                                        score: 40,
-                                        hit: true
-                                    }, {
-                                        o: false,
-                                        c: false,
+										o: false,
+										c: false,
                                         m: 0,
                                         f: 0,
-                                        s: 0,
-                                        h: false
-                                    }, {
-                                        opened: false,
-                                        closed: false,
-                                        multiplicator: 0,
-                                        field: 0,
-                                        score: 0,
-                                        hit: false
-                                    }
-                                    //
+                                        s: [0,0],
+										h: [0,0]
+									}
                                 ]
-                            }
+							}
                         ]
                     },
                     {
-                        score: 0,
-                        placement: undefined,
-                        players: [
+                        sc: 0,
+                        pl: 0,
+                        p: [
                             {
-                                name: "P2",
-                                throws: [ ]
+                                n: "P2",
+                                t: [/*
+                                    {
+                                        o: false,
+										c: false,
+                                        m: 0,
+                                        f: 0,
+										s: [0,0],
+										h: false
+									}*/
+                                ]
                             }
                         ]
                     }
                 ]
-            };*/
+            };
+
+			var oScore = {
+				numberPlayers: 0,
+				activePlayer: 0,
+				throwNr: 0,
+				score: [],
+				players: []
+			};
 
 			var fnStartCricket = function () {
 				
@@ -204,11 +206,27 @@
 						activePlayer: 0,
 						throwNr: 0,
 						score: [],
+						players: []
 						//round: 0
 					};
+					
 						oScore.numberPlayers = parseInt($("#playerNr").val());
 						for (var i = 0; i < oScore.numberPlayers; i++) {
-							oScore.score.push([0,0,0,0,0,0,0,0,0]);
+							var aPl=[];
+							oScore.score.push([0,0,0,0,0,0,0,0,0,0]);
+							if(oGame.tm.length<(oScore.numberPlayers))
+							{
+								oGame.tm.push({
+									sc: 0,
+									pl: 0,
+									p: [{n: ("P"+(i+3)),t: [{m: 0,f: 0,s: [0,0],h: [0,0]}]}]
+								});
+							}
+							for(var j=0;j<oGame.tm[i].p.length;j++)
+							{
+								aPl.push(oGame.tm[i].p[j].n);
+							}
+							oScore.players.push(aPl);
 						}
 				};
 
@@ -269,7 +287,8 @@
 								}
 							);
 						}
-						$(oTH).text("T" + i);
+						//$(oTH).text("T" + i);
+						$(oTH).text(oScore.players[i-1][oScore.score[i-1][9]]);
 						
 						oTableRow.append(oTH);
 						// oTableRow.append($("<th>P"+i+"</th>"));
@@ -351,6 +370,14 @@
 				};
 
 				var fnNextPlayer = function () {
+					if(oScore.score[oScore.activePlayer][9]==(oScore.players[oScore.activePlayer].length-1))
+					{
+						oScore.score[oScore.activePlayer][9]=0;
+					}
+					else
+					{
+						oScore.score[oScore.activePlayer][9]++;
+					}
 					if(oScore.activePlayer==(oScore.numberPlayers-1))
 					{	
 						oScore.activePlayer=0;
@@ -473,6 +500,7 @@
 					}
 				);
 				// alert(oScore.activePlayer+1);
+				$("#playerRegistration").on("dialogclose",fnBuildTable);
 				fnBuildTable();
 			};
 
@@ -1537,27 +1565,127 @@
 			};
         // we have jQuery at our disposal
 		$(document).ready(function () {
-			
             var dialog;
             dialog = $( "#playerRegistration" ).dialog({
-                autoOpen: false,
+                autoOpen: true,
                 height: 400,
                 width: 350,
                 modal: true,
                 closeOnEscape: false,
                 buttons: {
-                  Cancel: function() {
+                  Ok: function() {
                     dialog.dialog( "close" );
                   }
                 }
-            ,
+           		 ,
                 close: function() {
-                    form[ 0 ].reset();
                 }
-            });
+			});
+			
+			var fnUpdateTeamSelection= function () {
+				$("#nrTeams").empty();
+				for(var i=0;i<oScore.numberPlayers;i++)
+				{
+					var option = document.createElement("option");
+					option.value = i;
+					option.text = i+1;
+					$("#nrTeams").append(option);
+				}
+			};
+			var fnUpdateAccList = function (){
+				$("#accounts").empty();
+				$("#playerRemove").empty();
+				for(var i=0;i<oAccounts.length;i++)
+				{
+					var option = document.createElement("option");
+					option.value = oAccounts[i].n;
+					$("#accounts").append(option);
+				}
+				for(var i=0;i<oScore.numberPlayers;i++)
+				{
+					for(var j=0;j<oScore.players[i].length;j++)
+					{
+						if(!(oScore.players[i][j].substr(0,1)=="P" && parseInt(oScore.players[i][j].substr(1))>0 && parseInt(oScore.players[i][j].substr(1))<=8))
+						{
+							var option = document.createElement("option");
+							option.value = oScore.players[i][j];
+							option.text = oScore.players[i][j];
+							$("#playerRemove").append(option);
+						}
+					}
+				}
+			};
+
+			$("#addPlayer").click(
+					function(){
+						var alreadyExist = false;
+						var input = $("#playerNameIn").val();
+						for(var i=0;i<oAccounts.length;i++)
+						{
+							if(oAccounts[i].n==input)
+								alreadyExist=true;
+						}
+						if(!alreadyExist && input.length == 3/**/)
+						{
+							oAccounts.push({n:input});
+						}
+						var playerName = oScore.players[parseInt($("#nrTeams").val())][0];
+						alreadyExist=false;
+						for(var j=0;j<oScore.numberPlayers;j++)
+						{
+							for(var i=0;i<oScore.players[j].length;i++)
+							{
+								if(oScore.players[j][i]==input)
+										alreadyExist = true;
+							}
+						}
+						if(playerName.substr(0,1)=="P" && parseInt(playerName.substr(1))>0 && parseInt(playerName.substr(1))<=8)
+						{
+							if(!alreadyExist && input.length == 3)
+							{
+								oScore.players[parseInt($("#nrTeams").val())][0]=input;
+								oGame.tm[parseInt($("#nrTeams").val())].p[0].n=input;
+							}
+						}
+						else
+						{
+							
+							if(!alreadyExist && input.length == 3)
+							{
+								oScore.players[parseInt($("#nrTeams").val())].push(input);
+								oGame.tm[parseInt($("#nrTeams").val())].p.push({
+									n: input,t: [{m: 0,f: 0,s: [0,0],h: [0,0]}]
+								});
+							}
+						}
+						fnUpdateAccList();
+					}
+			);	
+			
+			$("#remove").click(
+				function() {
+					var input = $("#playerRemove").val();
+						for(var i=0;i<oScore.numberPlayers;i++)
+						{
+							if(oScore.players[i].length>1){
+								for(var j=0;j<oScore.players[i].length;j++)
+								{
+									if(oScore.players[i][j]==input)
+									{
+										oScore.players[i].splice(j,1);
+									}
+								}
+							}
+						}	
+					fnUpdateAccList();
+				}
+			);
+
 			/*fnBackup();*/
-            dialog.dialog("open");
+			dialog.dialog("open");
+			fnUpdateAccList();
 			fnStartCricket();
+			fnUpdateTeamSelection();
 
 			$("#dartboard #areas g").children().hover(
 				function () {
@@ -1573,7 +1701,9 @@
 					if($("#gamemode").val()=="cricket")
 					{
                         dialog.dialog("open");
+						fnUpdateAccList();
 						fnStartCricket();
+						fnUpdateTeamSelection();
 					}
 					if($("#gamemode").val()=="noSCricket")
 					{
@@ -1607,6 +1737,7 @@
 					}
 				}
 			);
+
 			$(".buttons").hover(
 				function () {
 					$(this).css("opacity", "0.6");

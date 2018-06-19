@@ -130,3 +130,7 @@ fieldset {
 #addPlayer {
     font-size:10pt;
 }
+#nrTeams {
+    float:right;
+    position: sticky;
+}
