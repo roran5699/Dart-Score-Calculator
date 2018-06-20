@@ -64,8 +64,12 @@
 
 			var fnStartCricket = function () {
 				
-				var fnWinner = function () {
+				var fnWinner = function (repeat) {
 					//hey, some comments
+					for(var i=0;i<repeat;i++)
+					{
+						fnNextPlayer();
+					}
 					if(oScore.score[oScore.activePlayer][8]==0)
 					{
 						var tmp=0;
@@ -83,12 +87,20 @@
 							if(oScore.score[i][8]>0)
 								tmp2++;
 						}
-						if(tmp1==oScore.score[oScore.activePlayer][7] && tmp==7)
+						if((tmp1==oScore.score[oScore.activePlayer][7] && tmp==7) || tmp2 == (oScore.numberPlayers-1))
 						{
 							oScore.score[oScore.activePlayer][8]=(tmp2+1);
 							tmp2++;
+							var currentPlayer = oScore.activePlayer;
+							for(var i=1;i<oScore.numberPlayers;i++)
+								fnWinner(1);
+							oScore.activePlayer = currentPlayer;
 							if(tmp2!=oScore.numberPlayers)
+							{	
 								fnNextPlayer();
+								fnBuildTable();
+								fnWinner(0);
+							}
 						}
 					}
 				};
@@ -211,17 +223,21 @@
 					};
 					
 						oScore.numberPlayers = parseInt($("#playerNr").val());
-						for (var i = 0; i < oScore.numberPlayers; i++) {
-							var aPl=[];
-							oScore.score.push([0,0,0,0,0,0,0,0,0,0]);
+						oGame.tm=[];
+						for (var i = 0; i < oScore.numberPlayers; i++)
+						{
 							if(oGame.tm.length<(oScore.numberPlayers))
 							{
 								oGame.tm.push({
 									sc: 0,
 									pl: 0,
-									p: [{n: ("P"+(i+3)),t: [{m: 0,f: 0,s: [0,0],h: [0,0]}]}]
+									p: [{n: ("P"+(i+1)),t: [{m: 0,f: 0,s: [0,0],h: [0,0]}]}]
 								});
 							}
+						}
+						for (var i = 0; i < oScore.numberPlayers; i++) {
+							var aPl=[];
+							oScore.score.push([0,0,0,0,0,0,0,0,0,0]);
 							for(var j=0;j<oGame.tm[i].p.length;j++)
 							{
 								aPl.push(oGame.tm[i].p[j].n);
@@ -235,7 +251,7 @@
 					var oTable = document.createElement("table");
 					var oTableRow = document.createElement("tr");
 					
-					fnWinner();
+					fnWinner(0);
 
 					oDiv.empty();
 					//oDiv.append(playerNr);
@@ -370,6 +386,12 @@
 				};
 
 				var fnNextPlayer = function () {
+					var nrWinner=0;
+					for(var i=0;i<oScore.numberPlayers;i++)
+					{
+						if(oScore.score[i][8]>0)
+							nrWinner++;
+					}
 					if(oScore.score[oScore.activePlayer][9]==(oScore.players[oScore.activePlayer].length-1))
 					{
 						oScore.score[oScore.activePlayer][9]=0;
@@ -381,17 +403,14 @@
 					if(oScore.activePlayer==(oScore.numberPlayers-1))
 					{	
 						oScore.activePlayer=0;
-						if(oScore.score[0][8]>0)
-							fnNextPlayer();
 					}
 					else
 					{
 						oScore.activePlayer++;
-						if(oScore.score[oScore.activePlayer][8]>0)
-							fnNextPlayer();
 					}
+					if(oScore.score[oScore.activePlayer][8]>0 && nrWinner<oScore.numberPlayers)
+						fnNextPlayer();
                     oScore.throwNr=0;
-                    fnBuildTable();
 				};
 
 				fnResetOScore();
@@ -1711,9 +1730,9 @@
 					if($("#gamemode").val()=="cricket")
 					{
                         dialog.dialog("open");
-						fnUpdateAccList();
 						fnStartCricket();
 						fnUpdateTeamSelection();
+						fnUpdateAccList();
 					}
 					if($("#gamemode").val()=="noSCricket")
 					{
