@@ -107,9 +107,23 @@
 								fnWinner(0);
 							}
 						}
+						// idea to show the player, who scored the highest total-Score
 						/* if(tmp2==oScore.numberPlayers)
 						{
-							localStorage.setItem("oCricket", JSON.stringify(oGame));
+							var totalScore=[];
+							for(var i=0;i<oGame.tm.length;i++)
+							{
+								for(var j=0;j<oGame.tm[i].p.length;j++)
+								{
+									totalScore.push([0,i,j]);
+									for(var k=0;k<oGame.tm[i].p[j].t.length;k++)
+									{
+										totalScore[i]+=oGame.tm[i].p[j].t[k].s;
+									}
+								}
+							}
+							totalScore.sort(function(a,b){return a-b;});
+							alert(totalScore[0][]);
 						} */
 					}
 				};
