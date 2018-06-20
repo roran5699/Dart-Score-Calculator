@@ -13,7 +13,7 @@
             var oGame = {
                 md: "cricket",
                 tm: [
-                    {
+                    /* {
                         sc: 0,
                         pl: 0,
                         p: [
@@ -26,7 +26,7 @@
                                         m: 0,
                                         f: 0,
                                         s: [0,0],
-										h: [0,0]
+										h: 0
 									}
                                 ]
 							}
@@ -46,11 +46,11 @@
                                         f: 0,
 										s: [0,0],
 										h: false
-									}*/
+									}*/ /*
                                 ]
                             }
                         ]
-                    }
+                    } */
                 ]
             };
 
@@ -91,10 +91,15 @@
 						{
 							oScore.score[oScore.activePlayer][8]=(tmp2+1);
 							tmp2++;
+
+							oGame.tm[oScore.activePlayer].sc = oScore.score[oScore.activePlayer][7];
+							oGame.tm[oScore.activePlayer].pl = oScore.score[oScore.activePlayer][8];
+
 							var currentPlayer = oScore.activePlayer;
 							for(var i=1;i<oScore.numberPlayers;i++)
 								fnWinner(1);
 							oScore.activePlayer = currentPlayer;
+
 							if(tmp2!=oScore.numberPlayers)
 							{	
 								fnNextPlayer();
@@ -102,10 +107,17 @@
 								fnWinner(0);
 							}
 						}
+						/* if(tmp2==oScore.numberPlayers)
+						{
+							localStorage.setItem("oCricket", JSON.stringify(oGame));
+						} */
 					}
 				};
 
 				var fnCountHits = function(d,r,m,sc1) {
+					var opened = false;
+					var closed = false;
+					var achievedScore=0;
 					switch(d)
 					{
 						case 3:
@@ -118,11 +130,10 @@
 										tmp++;
 								}
 								if(tmp!=oScore.numberPlayers)
+								{
 									oScore.score[oScore.activePlayer][7]+=(sc1*m);
-							}
-							else
-							{
-								oScore.score[0][7]+=sc1*m;
+									achievedScore=(sc1*m);
+								}
 							}
 							break;
 						case 2:
@@ -139,17 +150,20 @@
 											oScore.score[oScore.activePlayer][r]++;
 											tmp++;
 											if(tmp!=oScore.numberPlayers)
+											{
 												oScore.score[oScore.activePlayer][7]+=(sc1*(m-1));
+												achievedScore=(sc1*(m-1));
+												opened=true;
+											}
+											else
+											{
+												closed=true;
+											}
 										}
-									}
-									else
-									{
-										oScore.score[oScore.activePlayer][r]++;
-										oScore.score[oScore.activePlayer][7]+=(sc1*(m-1));
 									}
 									break;
 								case 1:
-								if(oScore.numberPlayers>1)
+									if(oScore.numberPlayers>1)
 									{
 										var tmp = 0;
 										for(var i=0;i<oScore.numberPlayers;i++)
@@ -162,6 +176,16 @@
 											if(m<3)
 											{
 												oScore.score[oScore.activePlayer][r]+=m;
+												tmp++;
+												if(tmp!=oScore.numberPlayers)
+												{
+													if(m==2)
+														opened=true;
+												}
+												else
+												{
+													closed=true;
+												}
 											}
 											else
 											{
@@ -170,6 +194,12 @@
 												if(tmp!=oScore.numberPlayers)
 												{
 													oScore.score[oScore.activePlayer][7]+=sc1;
+													achievedScore=sc1;
+													opened=true;
+												}
+												else
+												{
+													closed=true;
 												}
 											}
 										}
@@ -179,20 +209,35 @@
 										if(m<3)
 										{
 											oScore.score[oScore.activePlayer][r]+=m;
+											if(m==2)
+												opened=true;
 										}
 										else
 										{
 											oScore.score[oScore.activePlayer][r]+=2;
 											oScore.score[oScore.activePlayer][7]+=sc1;
+											achievedScore=sc1;
+											opened=true;
 										}
 									}
 									break;
 								case 0:
 									oScore.score[oScore.activePlayer][r]+=m;
+									if(m==3)
+										opened=true;
 									break;
 								default:
 									break;
 								}
+								oGame.tm[oScore.activePlayer].p[oScore.score[oScore.activePlayer][9]].t.push({
+									o: opened,
+									c: closed,
+									m: m,
+									f: sc1,
+									s: achievedScore,
+									h: oScore.score[oScore.activePlayer][r]
+								});
+								// oGame.tm[oScore.activePlayer].sc=oScore.score[oScore.activePlayer][7];
 								//fnBackup();
 				};
 
@@ -207,9 +252,11 @@
 						oBackup = JSON. parse(tmp);*/
 					for(var i=0;i<49;i++)
 					{
-						oBackup[i] = oBackup[i+1]
+						oBackup[0][i] = oBackup[0][i+1];
+						oBackup[1][i] = oBackup[1][i+1];
 					}
-					oBackup[49] = JSON.stringify(oScore);
+					oBackup[0][49] = JSON.stringify(oScore);
+					oBackup[1][49] = JSON.stringify(oGame);
 				};
 
 				var fnResetOScore = function() {
@@ -231,7 +278,7 @@
 								oGame.tm.push({
 									sc: 0,
 									pl: 0,
-									p: [{n: ("P"+(i+1)),t: [{m: 0,f: 0,s: [0,0],h: [0,0]}]}]
+									p: [{n: ("P"+(i+1)),t: []}]
 								});
 							}
 						}
@@ -295,8 +342,20 @@
 									var aId = oEvent.target.id.split("_");
 									if(aId[0]=="pId")
 									{
-										while(oScore.activePlayer!=aId[1])
+										while(oScore.activePlayer!=aId[1]){
+											for(var i=0;i<(3-oScore.throwNr);i++)
+											{
+												oGame.tm[oScore.activePlayer].p[oScore.score[oScore.activePlayer][9]].t.push({
+													o:false,
+													c:false,
+													m:0,
+													f:0,
+													s:0,
+													h:-1
+												});
+											}
 											fnNextPlayer();
+										}
 										fnBackup();
 										fnBuildTable();
 									}
@@ -357,11 +416,16 @@
 							$(oTH).click(
 								function(oEvent)
 								{
-									console.log(oEvent.target.id);
+									// console.log(oEvent.target.id);
 									var aId = oEvent.target.id.split("_");
 									if(oScore.activePlayer==aId[1] && aId[0]=="sId" && oScore.score[oScore.activePlayer][8] == 0)
 									{
 										fnCountHits(oScore.score[oScore.activePlayer][parseInt(aId[2])],parseInt(aId[2]),1,parseInt(aId[3]));
+										oScore.throwNr++;
+										if(oScore.throwNr>=3)
+										{
+											fnNextPlayer();
+										}
 										fnBackup();
 									}
 									fnBuildTable();
@@ -414,11 +478,12 @@
 				};
 
 				fnResetOScore();
-				oBackup=[];
+				var oBackup=[[],[]];
 				
 				for(var i=0;i<50;i++)
 				{
-					oBackup.push(JSON.stringify(oScore));
+					oBackup[0].push(JSON.stringify(oScore));
+					oBackup[1].push(JSON.stringify(oGame));
 				}
 				
 				$("#dartboard #areas g").children().off("click");
@@ -442,7 +507,21 @@
 							if(parseInt($(this).attr("id").substr(1))==25)
 								row=6
 							fnCountHits(oScore.score[oScore.activePlayer][row],row,multiplicator,score1);
-						}	
+						}
+						else
+						{
+							if(oScore.throwNr<3)
+							{
+								oGame.tm[oScore.activePlayer].p[oScore.score[oScore.activePlayer][9]].t.push({
+									o:false,
+									c:false,
+									m:multiplicator,
+									f:score1,
+									s:0,
+									h:-1
+								});
+							}
+						}
 						}
 						oScore.throwNr++;
 						if(oScore.throwNr==3)
@@ -450,35 +529,31 @@
 							fnNextPlayer();
 						}
 						fnBackup();
-							/*if(oScore.throwNr==3)
-							{
-								if(oScore.activePlayer==(oScore.numberPlayers-1))
-								{
-									oScore.activePlayer=0;
-								}
-								else
-								{
-									oScore.activePlayer++;
-								}
-								oScore.throwNr=0;
-								fnBackup();
-								oBackup = {
-									numberPlayers: 0,
-									activePlayer: 0,
-									throwNr: 0,
-									score: []
-								};
-					var tmp = JSON.stringify(oScore);
-					oBackup = JSON. parse(tmp);
-							}*/
 						fnBuildTable();
 					}
 				);
 				
+				/* $("#dartboard #score").click(
+					function () {
+						alert();
+					}
+				); */
+
 				$("#button2").off("click");
 				$("#button2").click(
 					function()
 					{
+						for(var i=0;i<(3-oScore.throwNr);i++)
+						{
+							oGame.tm[oScore.activePlayer].p[oScore.score[oScore.activePlayer][9]].t.push({
+								o:false,
+								c:false,
+								m:0,
+								f:0,
+								s:0,
+								h:-1
+							});
+						}
 						fnNextPlayer();
 						fnBackup();
 						/*if(oScore.activePlayer==(oScore.numberPlayers-1))
@@ -510,16 +585,26 @@
 							throwNr: 0,
 							score: []
 						};
-						oScore = JSON.parse(oBackup[48]);
+						oScore = JSON.parse(oBackup[0][48]);
+						oGame = JSON.parse(oBackup[1][48]);
 						for(var i=49;i>0;i--)
 						{
-							oBackup[i] = oBackup[i-1];
+							oBackup[0][i] = oBackup[0][i-1];
+							oBackup[1][i] = oBackup[1][i-1];
 						}
 						fnBuildTable();
 					}
 				);
 				// alert(oScore.activePlayer+1);
-				$("#playerRegistration").on("dialogclose",fnBuildTable);
+				$("#playerRegistration").on("dialogclose",function(){
+					oBackup=[[],[]];
+					for(var i=0;i<50;i++)
+					{
+						oBackup[0].push(JSON.stringify(oScore));
+						oBackup[1].push(JSON.stringify(oGame));
+					};
+					fnBuildTable();
+				});
 				fnBuildTable();
 			};
 
@@ -1689,7 +1774,7 @@
 							{
 								oScore.players[parseInt($("#nrTeams").val())].push(input);
 								oGame.tm[parseInt($("#nrTeams").val())].p.push({
-									n: input,t: [{m: 0,f: 0,s: [0,0],h: [0,0]}]
+									n: input,t: []
 								});
 							}
 						}
