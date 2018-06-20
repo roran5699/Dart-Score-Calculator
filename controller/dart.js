@@ -1616,10 +1616,18 @@
 				}
 			};
 
+			/*fnBackup();*/
+			oAccounts = JSON.parse(localStorage.getItem("oAccounts"));
+			dialog.dialog("open");
+			fnUpdateAccList();
+			fnStartCricket();
+			fnUpdateTeamSelection();
+
 			$("#addPlayer").click(
 					function(){
 						var alreadyExist = false;
 						var input = $("#playerNameIn").val();
+						document.getElementById("playerNameIn").value='';
 						for(var i=0;i<oAccounts.length;i++)
 						{
 							if(oAccounts[i].n==input)
@@ -1628,6 +1636,7 @@
 						if(!alreadyExist && input.length == 3/**/)
 						{
 							oAccounts.push({n:input});
+							localStorage.setItem("oAccounts",JSON.stringify(oAccounts));
 						}
 						var playerName = oScore.players[parseInt($("#nrTeams").val())][0];
 						alreadyExist=false;
@@ -1680,12 +1689,6 @@
 					fnUpdateAccList();
 				}
 			);
-
-			/*fnBackup();*/
-			dialog.dialog("open");
-			fnUpdateAccList();
-			fnStartCricket();
-			fnUpdateTeamSelection();
 
 			$("#dartboard #areas g").children().hover(
 				function () {
