@@ -1593,6 +1593,7 @@
 				}
 			};
 			var fnUpdateAccList = function (){
+				var team = parseInt($("#nrTeams").val());
 				$("#accounts").empty();
 				$("#playerRemove").empty();
 				for(var i=0;i<oAccounts.length;i++)
@@ -1607,21 +1608,27 @@
 					{
 						if(!(oScore.players[i][j].substr(0,1)=="P" && parseInt(oScore.players[i][j].substr(1))>0 && parseInt(oScore.players[i][j].substr(1))<=8))
 						{
-							var option = document.createElement("option");
-							option.value = oScore.players[i][j];
-							option.text = oScore.players[i][j];
-							$("#playerRemove").append(option);
+							if(team==i)
+							{
+								var option = document.createElement("option");
+								option.value = oScore.players[i][j];
+								option.text = oScore.players[i][j];
+								$("#playerRemove").append(option);
+							}
 						}
 					}
 				}
 			};
 
 			/*fnBackup();*/
-			oAccounts = JSON.parse(localStorage.getItem("oAccounts"));
-			dialog.dialog("open");
-			fnUpdateAccList();
+			if(localStorage.oAccounts)
+				oAccounts = JSON.parse(localStorage.getItem("oAccounts"));
 			fnStartCricket();
+			dialog.dialog("open");
 			fnUpdateTeamSelection();
+			fnUpdateAccList();
+
+			$("#nrTeams").on("change",fnUpdateAccList);
 
 			$("#addPlayer").click(
 					function(){
