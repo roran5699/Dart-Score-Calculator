@@ -32,6 +32,7 @@ td {
 .red {
     color: red;
     background-color:aqua;
+    /* color: rgba(135, 206, 250,0.2); */
 }
 .hit {
     background-color:#aaffcc;
@@ -134,3 +135,4 @@ fieldset {
     float:right;
     position: sticky;
 }
+

@@ -66,7 +66,7 @@
 				
 				var fnWinner = function (repeat) {
 					//hey, some comments
-					for(var i=0;i<repeat;i++)
+					if(repeat==1)
 					{
 						fnNextPlayer();
 					}
@@ -96,7 +96,7 @@
 							oGame.tm[oScore.activePlayer].pl = oScore.score[oScore.activePlayer][8];
 
 							var currentPlayer = oScore.activePlayer;
-							for(var i=1;i<oScore.numberPlayers;i++)
+							for(var i=0;i<oScore.numberPlayers;i++)
 								fnWinner(1);
 							oScore.activePlayer = currentPlayer;
 
@@ -108,23 +108,56 @@
 							}
 						}
 						// idea to show the player, who scored the highest total-Score
-						/* if(tmp2==oScore.numberPlayers)
+						if(tmp2==oScore.numberPlayers)
 						{
-							var totalScore=[];
+							var gameStatistics=[];
 							for(var i=0;i<oGame.tm.length;i++)
 							{
 								for(var j=0;j<oGame.tm[i].p.length;j++)
 								{
-									totalScore.push([0,i,j]);
+									var aTmp = [0,0,0,0,i,j];
 									for(var k=0;k<oGame.tm[i].p[j].t.length;k++)
 									{
-										totalScore[i]+=oGame.tm[i].p[j].t[k].s;
+										aTmp[0]+=oGame.tm[i].p[j].t[k].s; //total Score, the Player achieved
+										
+										if(oGame.tm[i].p[j].t[k].o)	//number of opened fields
+											aTmp[1]++;
+										
+										if(oGame.tm[i].p[j].t[k].c)	//number of closed fields
+											aTmp[2]++;
+										
+										//number of throws, that missed
+										if(oGame.tm[i].p[j].t[k].m == 0 || oGame.tm[i].p[j].t[k].f == 0)
+											aTmp[3]++;
 									}
+									gameStatistics.push(aTmp);
 								}
 							}
-							totalScore.sort(function(a,b){return a-b;});
-							alert(totalScore[0][]);
-						} */
+							// alert(oGame.tm[gameStatistics[0][1]].p[gameStatistics[0][2]].n + " scored at most in total.");
+							var plNr=0;
+							for(var i=0;i<oGame.tm.length;i++)
+							{
+								for(var j=0;j<oGame.tm[i].p.length;j++)
+								{
+									for(var k=0;k<oAccounts.length;k++)
+									{
+										if(oAccounts[k].n==oGame.tm[i].p[j].n)
+										{
+											oAccounts[k].s.push({
+												ts:	gameStatistics[plNr][0],
+												o:	gameStatistics[plNr][1],
+												c:	gameStatistics[plNr][2],
+												m:	gameStatistics[plNr][3],
+												i:	oAccounts[k].s.length
+											});
+										}
+									}
+									plNr++;
+								}
+							}
+							gameStatistics.sort(function(a,b){return b[0]-a[0];});
+							localStorage.setItem("oAccounts",JSON.stringify(oAccounts));
+						}
 					}
 				};
 
@@ -238,7 +271,18 @@
 								case 0:
 									oScore.score[oScore.activePlayer][r]+=m;
 									if(m==3)
-										opened=true;
+									{
+										var tmp = 0;
+										for(var i=0;i<oScore.numberPlayers;i++)
+										{
+											if(oScore.score[i][r]==3)
+												tmp++;
+										}
+										if(tmp<oScore.numberPlayers)
+											opened=true;
+										else
+											closed=true;
+									}
 									break;
 								default:
 									break;
@@ -513,9 +557,9 @@
 						multiplicator=2;
 					if($(this).attr("id").substr(0,1)=="t")
 						multiplicator=3;
-					if (oScore.numberPlayers != 0) 
+					if (oScore.numberPlayers != 0 && oScore.throwNr<3) 
 					{
-						if(score1 >= 15 && oScore.score[oScore.activePlayer][8]==0 && oScore.throwNr<3)
+						if(score1 >= 15 && oScore.score[oScore.activePlayer][8]==0)
 						{
 							var row = 20-parseInt($(this).attr("id").substr(1));
 							if(parseInt($(this).attr("id").substr(1))==25)
@@ -524,22 +568,20 @@
 						}
 						else
 						{
-							if(oScore.throwNr<3)
-							{
-								oGame.tm[oScore.activePlayer].p[oScore.score[oScore.activePlayer][9]].t.push({
-									o:false,
-									c:false,
-									m:multiplicator,
-									f:score1,
-									s:0,
-									h:-1
-								});
-							}
+							oGame.tm[oScore.activePlayer].p[oScore.score[oScore.activePlayer][9]].t.push({
+								o:false,
+								c:false,
+								m:multiplicator,
+								f:score1,
+								s:0,
+								h:-1
+							});
 						}
 						}
 						oScore.throwNr++;
 						if(oScore.throwNr==3)
 						{
+							fnWinner();
 							fnNextPlayer();
 						}
 						fnBackup();
@@ -1760,7 +1802,7 @@
 						}
 						if(!alreadyExist && input.length == 3/**/)
 						{
-							oAccounts.push({n:input});
+							oAccounts.push({n:input,s:[]});
 							localStorage.setItem("oAccounts",JSON.stringify(oAccounts));
 						}
 						var playerName = oScore.players[parseInt($("#nrTeams").val())][0];

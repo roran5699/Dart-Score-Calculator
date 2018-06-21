@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    </head>
+    <body>
+            <canvas id="myChart"></canvas>
+            <script>
+            var ctx = document.getElementById("myChart");
+            if(localStorage.oAccounts)
+            {
+                var oAccounts = JSON.parse(localStorage.oAccounts);
+                var labels = [];
+                var dataTS = [];
+                var dataNr = [];
+                var dataO = [];
+                var dataC = [];
+                var dataM = [];
+                for(var i=0;i<oAccounts.length;i++)
+                {
+                    if(oAccounts[i].s.length>0){
+                        var allGamesScore = 0;
+                        var openedFields = 0;
+                        var closedFields = 0;
+                        var missedThrows = 0;
+                        for(var j=0;j<oAccounts[i].s.length;j++)
+                        {
+                            allGamesScore+=oAccounts[i].s[j].ts;
+                            openedFields+=oAccounts[i].s[j].o;
+                            closedFields+=oAccounts[i].s[j].c;
+                            missedThrows+=oAccounts[i].s[j].m;
+                        }
+                        allGamesScore/=(oAccounts[i].s[oAccounts[i].s.length-1].i+1);
+                        labels.push(oAccounts[i].n);
+                        dataTS.push(allGamesScore);
+                        dataNr.push(oAccounts[i].s[oAccounts[i].s.length-1].i+1);
+                        dataO.push(openedFields);
+                        dataC.push(closedFields);
+                        dataM.push(missedThrows);
+                    }
+                }
+            
+
+                var myChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                        {
+                            label: 'Average Score of all Games',
+                            data: dataTS,
+                            pointBackgroundColor: 'rgb(0, 0, 200)',
+                            backgroundColor: [
+                                'rgba(135, 206, 250,0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(135, 206, 250, 0.6)'
+                            ],
+                            borderWidth: 1
+                        },
+                        {
+                            label: '# of Games',
+                            data: dataNr,
+                            pointBackgroundColor: 'rgb(200, 0, 0)',
+                            backgroundColor: [
+                                'rgba(200, 0, 0, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(200, 0, 0, 0.6)'
+                            ],
+                            borderWidth: 1
+                        },
+                        {
+                            label: '# of opened areas',
+                            data: dataO,
+                            pointBackgroundColor: 'rgb(0,200,0)',
+                            backgroundColor: [
+                                'rgba(0, 200, 0, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(0, 200, 0, 0.6)'
+                            ],
+                            borderWidth: 1
+                        },
+                        {
+                            label: '# of closed areas',
+                            data: dataC,
+                            pointBackgroundColor: 'rgb(200,200,0)',
+                            backgroundColor: [
+                                'rgba(200, 200, 0, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(200, 200, 0, 0.6)'
+                            ],
+                            borderWidth: 1
+                        },
+                        {
+                            label: '# of missed throws',
+                            data: dataM,
+                            pointBackgroundColor: 'rgb(0,0,0)',
+                            backgroundColor: [
+                                'rgba(0, 0, 0, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(0, 0, 0, 0.6)'
+                            ],
+                            borderWidth: 1
+                        }
+                        ]
+                    },
+                    options: {
+                        responsive:true,
+                        scale: {
+                            ticks: {
+                                beginAtZero:true
+                            }
+                        }
+                    }
+                });
+            }
+            </script>
+    </body>
+</html>
