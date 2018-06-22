@@ -113,9 +113,10 @@
 							var gameStatistics=[];
 							for(var i=0;i<oGame.tm.length;i++)
 							{
+								oGame.tm[i].pl=oScore.score[i][8];
 								for(var j=0;j<oGame.tm[i].p.length;j++)
 								{
-									var aTmp = [0,0,0,0,i,j];
+									var aTmp = [0,0,0,0,0,i,j];
 									for(var k=0;k<oGame.tm[i].p[j].t.length;k++)
 									{
 										aTmp[0]+=oGame.tm[i].p[j].t[k].s; //total Score, the Player achieved
@@ -130,6 +131,8 @@
 										if(oGame.tm[i].p[j].t[k].m == 0 || oGame.tm[i].p[j].t[k].f == 0)
 											aTmp[3]++;
 									}
+									//position for average position
+									aTmp[4]=oGame.tm[i].pl;
 									gameStatistics.push(aTmp);
 								}
 							}
@@ -148,6 +151,7 @@
 												o:	gameStatistics[plNr][1],
 												c:	gameStatistics[plNr][2],
 												m:	gameStatistics[plNr][3],
+												p:	gameStatistics[plNr][4],
 												i:	oAccounts[k].s.length
 											});
 										}
@@ -155,8 +159,9 @@
 									plNr++;
 								}
 							}
-							gameStatistics.sort(function(a,b){return b[0]-a[0];});
+							//gameStatistics.sort(function(a,b){return b[0]-a[0];});
 							localStorage.setItem("oAccounts",JSON.stringify(oAccounts));
+							$("#showStatistics").click();
 						}
 					}
 				};
@@ -184,22 +189,50 @@
 							}
 							break;
 						case 2:
-									if(oScore.numberPlayers>1)
+							if(oScore.numberPlayers>1)
+							{
+								var tmp = 0;
+								for(var i=0;i<oScore.numberPlayers;i++)
+								{
+									if(oScore.score[i][r]==3)
+										tmp++;
+								}
+								if(tmp!=oScore.numberPlayers)
+								{
+									oScore.score[oScore.activePlayer][r]++;
+									tmp++;
+									if(tmp!=oScore.numberPlayers)
 									{
-										var tmp = 0;
-										for(var i=0;i<oScore.numberPlayers;i++)
+										oScore.score[oScore.activePlayer][7]+=(sc1*(m-1));
+										achievedScore=(sc1*(m-1));
+										opened=true;
+									}
+									else
+									{
+										closed=true;
+									}
+								}
+							}
+							break;
+						case 1:
+							if(oScore.numberPlayers>1)
+							{
+								var tmp = 0;
+								for(var i=0;i<oScore.numberPlayers;i++)
+								{
+									if(oScore.score[i][r]==3)
+										tmp++;
+								}
+								if(tmp!=oScore.numberPlayers)
+								{
+									if(m<3)
+									{
+										oScore.score[oScore.activePlayer][r]+=m;
+										if(m==2)
 										{
-											if(oScore.score[i][r]==3)
-												tmp++;
-										}
-										if(tmp!=oScore.numberPlayers)
-										{
-											oScore.score[oScore.activePlayer][r]++;
 											tmp++;
 											if(tmp!=oScore.numberPlayers)
 											{
-												oScore.score[oScore.activePlayer][7]+=(sc1*(m-1));
-												achievedScore=(sc1*(m-1));
 												opened=true;
 											}
 											else
@@ -208,95 +241,68 @@
 											}
 										}
 									}
-									break;
-								case 1:
-									if(oScore.numberPlayers>1)
-									{
-										var tmp = 0;
-										for(var i=0;i<oScore.numberPlayers;i++)
-										{
-											if(oScore.score[i][r]==3)
-												tmp++;
-										}
-										if(tmp!=oScore.numberPlayers)
-										{
-											if(m<3)
-											{
-												oScore.score[oScore.activePlayer][r]+=m;
-												tmp++;
-												if(tmp!=oScore.numberPlayers)
-												{
-													if(m==2)
-														opened=true;
-												}
-												else
-												{
-													closed=true;
-												}
-											}
-											else
-											{
-												oScore.score[oScore.activePlayer][r]+=2;
-												tmp++;
-												if(tmp!=oScore.numberPlayers)
-												{
-													oScore.score[oScore.activePlayer][7]+=sc1;
-													achievedScore=sc1;
-													opened=true;
-												}
-												else
-												{
-													closed=true;
-												}
-											}
-										}
-									}
 									else
 									{
-										if(m<3)
+										oScore.score[oScore.activePlayer][r]+=2;
+										tmp++;
+										if(tmp!=oScore.numberPlayers)
 										{
-											oScore.score[oScore.activePlayer][r]+=m;
-											if(m==2)
-												opened=true;
-										}
-										else
-										{
-											oScore.score[oScore.activePlayer][r]+=2;
 											oScore.score[oScore.activePlayer][7]+=sc1;
 											achievedScore=sc1;
 											opened=true;
 										}
-									}
-									break;
-								case 0:
-									oScore.score[oScore.activePlayer][r]+=m;
-									if(m==3)
-									{
-										var tmp = 0;
-										for(var i=0;i<oScore.numberPlayers;i++)
-										{
-											if(oScore.score[i][r]==3)
-												tmp++;
-										}
-										if(tmp<oScore.numberPlayers)
-											opened=true;
 										else
+										{
 											closed=true;
+										}
 									}
-									break;
-								default:
-									break;
 								}
-								oGame.tm[oScore.activePlayer].p[oScore.score[oScore.activePlayer][9]].t.push({
-									o: opened,
-									c: closed,
-									m: m,
-									f: sc1,
-									s: achievedScore,
-									h: oScore.score[oScore.activePlayer][r]
-								});
-								// oGame.tm[oScore.activePlayer].sc=oScore.score[oScore.activePlayer][7];
-								//fnBackup();
+							}
+							else
+							{
+								if(m<3)
+								{
+									oScore.score[oScore.activePlayer][r]+=m;
+									if(m==2)
+										opened=true;
+								}
+								else
+								{
+									oScore.score[oScore.activePlayer][r]+=2;
+									oScore.score[oScore.activePlayer][7]+=sc1;
+									achievedScore=sc1;
+									opened=true;
+								}
+							}
+							break;
+						case 0:
+							oScore.score[oScore.activePlayer][r]+=m;
+							if(m==3)
+							{
+								var tmp = 0;
+								for(var i=0;i<oScore.numberPlayers;i++)
+								{
+									if(oScore.score[i][r]==3)
+										tmp++;
+								}
+								if(tmp<oScore.numberPlayers)
+									opened=true;
+								else
+									closed=true;
+							}
+							break;
+						default:
+							break;
+						}
+						oGame.tm[oScore.activePlayer].p[oScore.score[oScore.activePlayer][9]].t.push({
+							o: opened,
+							c: closed,
+							m: m,
+							f: sc1,
+							s: achievedScore,
+							h: oScore.score[oScore.activePlayer][r]
+							}
+						);
 				};
 
 				var fnBackup = function () {
@@ -652,6 +658,7 @@
 					}
 				);
 				// alert(oScore.activePlayer+1);
+				$("#playerRegistration").off("dialogclose");
 				$("#playerRegistration").on("dialogclose",function(){
 					oBackup=[[],[]];
 					for(var i=0;i<50;i++)
@@ -661,6 +668,14 @@
 					};
 					fnBuildTable();
 				});
+
+				$("#showStatistics").off("click");
+				$("#showStatistics").click(
+					function () {
+						var win = window.open("statistics.html", '_blank');
+						win.focus();
+					}
+				);
 				fnBuildTable();
 			};
 
@@ -1779,6 +1794,14 @@
 					}
 				}
 			};
+			var fnDisableStatisticsButton = function () {
+				if($("#gamemode").val()=="cricket"){
+					$("#showStatistics").css("visibility","visible");
+				}
+				else{
+					$("#showStatistics").css("visibility","hidden");
+				}
+			};
 
 			/*fnBackup();*/
 			if(localStorage.oAccounts)
@@ -1856,6 +1879,8 @@
 					fnUpdateAccList();
 				}
 			);
+
+			$("#gamemode").on("change",fnDisableStatisticsButton);
 
 			$("#dartboard #areas g").children().hover(
 				function () {

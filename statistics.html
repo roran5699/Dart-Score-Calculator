@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link href="css/style.css" rel="stylesheet" type="text/css"/>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
     </head>
-    <body>
+    <body id="statisticsBody">
             <canvas id="myChart"></canvas>
             <script>
             var ctx = document.getElementById("myChart");
@@ -16,28 +17,39 @@
                 var dataO = [];
                 var dataC = [];
                 var dataM = [];
+                var dataP = [];
                 for(var i=0;i<oAccounts.length;i++)
                 {
                     if(oAccounts[i].s.length>0){
-                        var allGamesScore = 0;
-                        var openedFields = 0;
-                        var closedFields = 0;
-                        var missedThrows = 0;
-                        for(var j=0;j<oAccounts[i].s.length;j++)
-                        {
-                            allGamesScore+=oAccounts[i].s[j].ts;
-                            openedFields+=oAccounts[i].s[j].o;
-                            closedFields+=oAccounts[i].s[j].c;
-                            missedThrows+=oAccounts[i].s[j].m;
-                        }
-                        allGamesScore/=(oAccounts[i].s[oAccounts[i].s.length-1].i+1);
-                        labels.push(oAccounts[i].n);
-                        dataTS.push(allGamesScore);
-                        dataNr.push(oAccounts[i].s[oAccounts[i].s.length-1].i+1);
-                        dataO.push(openedFields);
-                        dataC.push(closedFields);
-                        dataM.push(missedThrows);
+                    var allGamesScore = 0;
+                    var openedFields = 0;
+                    var closedFields = 0;
+                    var missedThrows = 0;
+                    var totalPosition = 0;
+                    for(var j=0;j<oAccounts[i].s.length;j++)
+                    {
+                        allGamesScore+=oAccounts[i].s[j].ts;
+                        openedFields+=oAccounts[i].s[j].o;
+                        closedFields+=oAccounts[i].s[j].c;
+                        missedThrows+=oAccounts[i].s[j].m;
+                        totalPosition+=oAccounts[i].s[j].p;
                     }
+                    if(oAccounts[i].s.length>0)
+                    {
+                        allGamesScore/=(oAccounts[i].s.length);
+                        totalPosition/=(oAccounts[i].s.length);
+                    }
+                    labels.push(oAccounts[i].n);
+                    dataTS.push(allGamesScore);
+                    if(oAccounts[i].s.length>0)
+                        dataNr.push(oAccounts[i].s[oAccounts[i].s.length-1].i+1);
+                    else
+                        dataNr.push(0);
+                    dataO.push(openedFields);
+                    dataC.push(closedFields);
+                    dataM.push(missedThrows);
+                    dataP.push(totalPosition);
+                }
                 }
             
 
@@ -49,48 +61,48 @@
                         {
                             label: 'Average Score of all Games',
                             data: dataTS,
-                            pointBackgroundColor: 'rgb(0, 0, 200)',
+                            pointBackgroundColor: 'rgb(0, 0, 255)',
                             backgroundColor: [
-                                'rgba(135, 206, 250,0.2)'
+                                'rgba(0, 0, 255,0.2)'
                             ],
                             borderColor: [
-                                'rgba(135, 206, 250, 0.6)'
+                                'rgba(0, 0, 255, 0.6)'
                             ],
                             borderWidth: 1
                         },
                         {
                             label: '# of Games',
                             data: dataNr,
-                            pointBackgroundColor: 'rgb(200, 0, 0)',
+                            pointBackgroundColor: 'rgb(255, 0, 0)',
                             backgroundColor: [
-                                'rgba(200, 0, 0, 0.2)'
+                                'rgba(255, 0, 0, 0.2)'
                             ],
                             borderColor: [
-                                'rgba(200, 0, 0, 0.6)'
+                                'rgba(255, 0, 0, 0.6)'
                             ],
                             borderWidth: 1
                         },
                         {
                             label: '# of opened areas',
                             data: dataO,
-                            pointBackgroundColor: 'rgb(0,200,0)',
+                            pointBackgroundColor: 'rgb(0,255,0)',
                             backgroundColor: [
-                                'rgba(0, 200, 0, 0.2)'
+                                'rgba(0, 255, 0, 0.2)'
                             ],
                             borderColor: [
-                                'rgba(0, 200, 0, 0.6)'
+                                'rgba(0, 255, 0, 0.6)'
                             ],
                             borderWidth: 1
                         },
                         {
                             label: '# of closed areas',
                             data: dataC,
-                            pointBackgroundColor: 'rgb(200,200,0)',
+                            pointBackgroundColor: 'rgb(255,255,0)',
                             backgroundColor: [
-                                'rgba(200, 200, 0, 0.2)'
+                                'rgba(255, 255, 0, 0.2)'
                             ],
                             borderColor: [
-                                'rgba(200, 200, 0, 0.6)'
+                                'rgba(255, 255, 0, 0.6)'
                             ],
                             borderWidth: 1
                         },
@@ -103,6 +115,18 @@
                             ],
                             borderColor: [
                                 'rgba(0, 0, 0, 0.6)'
+                            ],
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Average Position of all Games',
+                            data: dataP,
+                            pointBackgroundColor: 'rgb(255,165,0)',
+                            backgroundColor: [
+                                'rgba(255, 165, 0, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 165, 0, 0.6)'
                             ],
                             borderWidth: 1
                         }
